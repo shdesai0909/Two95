@@ -1,0 +1,231 @@
+
+SQL Exercises:
+
+Q1. What are different types of joins and explain them?
+
+A1: Joins are used when we need to retrieve data from multiple tables in a Relational Database System.
+	Basically there are 3 different Join types.
+1.	Equi, Simple, Natural or Inner Join: This type of join allows you to select all the records 						from both the tables based on the matching criteria
+2.	Cartesian Join: This type of join gives the records 						from both the tables without matching criteria i.e. the WHERE clause. 
+3.	Non-Equi Join: 
+4.	 Inner Join: Inner join allows you to select all the records 						from both the tables based on the matching criteria.
+5.	 Self Join: Self join allows you to select all the records from the same table based on the matching criteria on the two table column of the same table.
+		
+6.	 Right Join: 
+
+Q2. What is sub Query ? Show an example.
+A1: 
+
+Q3. What is group by? 
+A1: 
+
+Q4. What is the difference between order by and group by?
+A1: 
+
+Q5. What is the difference between left outer join and right outer join?
+A1: 
+
+Q6. What is self join? Explain with an example?
+A1: 
+
+Q7. What is stored procedure?
+A1: 
+
+Q8. What is stored function?
+A1: 
+
+Q9. What is the difference between stored procedure and function?
+A1: 
+
+Q10. What is view?
+A1: 
+
+Q11. What are indexes?
+A1: 
+
+Q12. What are different types of constraints? Explain them.
+
+Create SQL Query for the following with the HR Schema in your Oracle Instance.
+Two95SabAsgn9_0??_100315:
+SELECT e.* FROM HR.EMPLOYEES e;
+Total 107 Records.
+Query 1: Display all the employee id, employee name, department name, the country where this department is located?
+Two95SabAsgn9_01_100315:
+SELECT e.EMPLOYEE_ID AS Emp_ID,
+  e.FIRST_NAME       As First_Name,
+  e.LAST_NAME       AS Last_Name,
+  e.DEPARTMENT_ID       As Dept_Id
+FROM HR.EMPLOYEES e, HR.DEPARTMENTS d
+WHERE e.DEPARTMENT_ID = d.DEPARTMENT_ID;
+Total 106 Records.
+
+SELECT e.*
+FROM HR.EMPLOYEES e INNER JOIN HR.DEPARTMENTS d
+ON e.DEPARTMENT_ID = d.DEPARTMENT_ID;
+Total 106 Results/Rows/Records selected.
+	
+
+SELECT e.*, d.DEPARTMENT_NAME, l.CITY, c.COUNTRY_NAME
+FROM HR.EMPLOYEES e 
+INNER JOIN HR.DEPARTMENTS d
+  ON e.DEPARTMENT_ID = d.DEPARTMENT_ID 
+    INNER JOIN HR.LOCATIONS l
+     ON d.LOCATION_ID = l.LOCATION_ID
+      INNER JOIN HR.COUNTRIES c
+       ON l.COUNTRY_ID = c.COUNTRY_ID ;
+	
+
+Query 2: Find out all the employees who joined before their manager?
+--Find out all the employees who joined before their manager?
+	SELECT e1.EMPLOYEE_ID,
+  e1.FIRST_NAME
+  || ' '
+  || e1.LAST_NAME AS Employee_Name,
+  e2.EMPLOYEE_ID,
+  e2.FIRST_NAME
+  || ' '
+  || e2.LAST_NAME AS Manager_Name,
+  e1.HIRE_DATE    AS Employee_Date,
+  e2.HIRE_DATE    AS Manager_Date
+FROM HR.EMPLOYEES e1
+LEFT OUTER JOIN HR.EMPLOYEES e2
+ON e1.MANAGER_ID   = e2.EMPLOYEE_ID
+WHERE e1.HIRE_DATE < e2.HIRE_DATE
+AND e1.MANAGER_ID IS NOT NULL ;
+Total 37 Results/Rows/Records.
+Query 3: Find out all the employees who do not belong to any department?
+SELECT e1.EMPLOYEE_ID,
+  e1.FIRST_NAME
+  || ' '
+  || e1.LAST_NAME AS Employee_Name, e1.DEPARTMENT_ID, 
+  e1.HIRE_DATE    AS Employee_Hire_Date
+FROM HR.EMPLOYEES e1
+WHERE e1.DEPARTMENT_ID IS NULL ;
+	Total 1 Results/Rows/Records.
+Query 4: Find out all the departments in which there are no employees?
+--Find out all the departments in which there are no employees??
+SELECT d1.DEPARTMENT_NAME
+FROM HR.DEPARTMENTS d1
+LEFT OUTER JOIN HR.EMPLOYEES ee ON ee.DEPARTMENT_ID = d1.DEPARTMENT_ID
+WHERE ee.DEPARTMENT_ID IS NULL ;
+	Total 16 Results/Rows/Records.
+Query 5: Find out first name, last name and employee id of top 10 employees based on their salary.
+SELECT *
+FROM
+  (SELECT ee.FIRST_NAME,
+    ee.LAST_NAME AS Employee,
+    ee.EMPLOYEE_ID,
+    ee.SALARY
+  FROM HR.EMPLOYEES ee
+  ORDER BY ee.SALARY DESC
+  )
+WHERE ROWNUM <= 10;
+	Total 10 Results/Rows/Records.
+
+Query 6: Find out the bottom 10 employees based on their salary.
+--Find out first name, last name and employee id of bottom 10 employees based on their salary.
+SELECT *
+FROM
+  (SELECT ee.FIRST_NAME,
+    ee.LAST_NAME AS Employee,
+    ee.EMPLOYEE_ID,
+    ee.SALARY
+  FROM HR.EMPLOYEES ee
+  ORDER BY ee.SALARY ASC
+  )
+WHERE ROWNUM <= 10;
+	Total 10 Results/Rows/Records.
+
+Query 7: Find out the location with most number of employees.
+--Find out first name, last name and employee id of bottom 10 employees based on their salary.
+SELECT * FROM (
+SELECT COUNT(Location) As Location_Emplyoee_Count
+FROM 
+  (SELECT ee.FIRST_NAME,
+    ee.LAST_NAME AS Employee,
+    ee.EMPLOYEE_ID,
+    ee.SALARY,
+    dp.LOCATION_ID  as Location
+    FROM HR.EMPLOYEES ee
+    INNER JOIN HR.DEPARTMENTS dp
+      ON ee.DEPARTMENT_ID = dp.DEPARTMENT_ID
+        INNER JOIN HR.LOCATIONS lc
+          ON dp.LOCATION_ID = lc.LOCATION_ID
+  ) GROUP BY Location ORDER BY Location_Emplyoee_Count DESC
+  )
+WHERE ROWNUM < 2;	
+Total 1 Results/Rows/Records. (Employee Count = 45)
+
+Query 8: Display details of jobs in the descending order of the title. 
+(***Assuming Jobs held by current Employees)
+SELECT COUNT(Job_Title), Job_Title
+FROM 
+  (
+  SELECT ee.FIRST_NAME,
+    ee.LAST_NAME AS Employee,
+    ee.EMPLOYEE_ID,
+    ee.SALARY,
+    jb.JOB_TITLE  as Job_Title
+    FROM HR.EMPLOYEES ee
+    INNER JOIN HR.JOBS jb
+      ON ee.JOB_ID = jb.JOB_ID
+  ) GROUP BY Job_Title ORDER BY Job_Title DESC
+;	
+Total 8 Results/Rows/Records.
+
+Query 9: Display details of the employees where commission percentage is null and salary in the range 5000 to 10000 and department is 30.
+  SELECT ee.FIRST_NAME,
+    ee.LAST_NAME AS Employee,
+    ee.EMPLOYEE_ID,
+    ee.SALARY,
+    ee.COMMISSION_PCT,
+    dp.DEPARTMENT_ID  as Dept,
+    dp.DEPARTMENT_NAME  as Department
+    FROM HR.EMPLOYEES ee
+    INNER JOIN HR.DEPARTMENTS dp
+      ON ee.DEPARTMENT_ID = dp.DEPARTMENT_ID 
+      WHERE ee.DEPARTMENT_ID = 30 
+        AND COMMISSION_PCT is null
+          AND ee.SALARY BETWEEN 5000 and 10000;
+Total 0 (None) Results/Rows/Records.
+
+Query 10: Display first name of employees who joined after 2001.
+  SELECT ee.FIRST_NAME || ' ' || ee.LAST_NAME AS Employee,
+    ee.EMPLOYEE_ID,
+    ee.SALARY,
+    ee.HIRE_DATE,
+    dp.DEPARTMENT_ID  as Dept,
+    dp.DEPARTMENT_NAME  as Department
+    FROM HR.EMPLOYEES ee
+    INNER JOIN HR.DEPARTMENTS dp
+      ON ee.DEPARTMENT_ID = dp.DEPARTMENT_ID 
+      WHERE ee.HIRE_DATE > '31-DEC-2001'
+Total 105 Results/Rows/Records.
+
+Query 11: Display first name and last name after converting the first letter of each name to upper case and the rest to lower case.
+	Total 37 Results/Rows/Records.
+
+Query 12: Display first name in upper case and email address in lower case for employees where the first name and email address are same irrespective of the case.
+	Total 37 Results/Rows/Records.
+
+Query 13: Display number of employees joined after 15th of the month.
+	Total 37 Results/Rows/Records.
+
+Query 14: Display the country ID and number of cities we have in the country.
+	Total 37 Results/Rows/Records.
+
+Query 15: Display years in which more than 10 employees joined.
+	Total 37 Results/Rows/Records.
+
+Query 16: Change salary of employee 115 to 8000 if the existing salary is less than 6000.
+	Total 37 Results/Rows/Records.
+
+Query 17: Display department name and manager first name.
+	Total 37 Results/Rows/Records.
+
+Query 18: Display details of manager who manages more than 5 employees.
+	Total 37 Results/Rows/Records.
+
+Query 19: Display third highest salary of all employees.
+	Total 37 Results/Rows/Records.
+
